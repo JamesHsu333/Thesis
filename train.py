@@ -12,7 +12,9 @@ from tqdm import tqdm
 
 import dataloaders.dataloader as dataloader
 from evaluate import evaluate
-from model.deeplab import *
+from model.deeplab.deeplab import *
+from model.GCN.GCN import *
+from model.FCN.FCN import *
 from model.sync_batchnorm.replicate import patch_replication_callback
 from utils.loss import loss_fns
 from utils.lr_scheduler import LR_Scheduler
@@ -162,14 +164,14 @@ if __name__ == '__main__':
 
     logging.info("-done")
 
-    if args.model_type=='deeplabU':
-        model = DeepLabU(num_classes=args.num_classes,
+    if args.model_type=='FCN':
+        model = FCN(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
-    elif args.model_type=='deeplab_GCN':
-        model = DeepLab_GCN(num_classes=args.num_classes,
+    elif args.model_type=='GCN':
+        model = GCN(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,
