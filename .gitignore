@@ -1,0 +1,11 @@
+__pycache__
+*/__pycache__
+data/JPEGImages
+data/SegmentationClass
+experiments/
+*.tar
+*.log
+!.gitkeep
+*.json
+!params.json
+images
