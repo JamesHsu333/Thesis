@@ -13,8 +13,8 @@ from tqdm import tqdm
 import dataloaders.dataloader as dataloader
 from evaluate import evaluate
 from model.deeplab.deeplab import *
-from model.GCN.GCN import *
 from model.FCN.FCN import *
+from model.GCN.GCN import *
 from model.sync_batchnorm.replicate import patch_replication_callback
 from utils.loss import loss_fns
 from utils.lr_scheduler import LR_Scheduler
