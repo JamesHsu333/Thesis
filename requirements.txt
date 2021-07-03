@@ -1,4 +1,4 @@
-matplotlib.pyplot
+matplotlib
 numpy
 Pillow
 torch>=1.2
