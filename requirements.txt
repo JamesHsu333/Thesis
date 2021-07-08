@@ -1,7 +1,10 @@
 matplotlib
 numpy
 Pillow
-torch>=1.2
 tabulate
-tqdm
+torch>=1.9
 torchvision
+tensorboard
+tensorboardX
+torchsummary
+tqdm
