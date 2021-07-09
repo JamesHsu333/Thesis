@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 import dataloaders.dataloader as dataloader
 from model.deeplab.deeplab import *
+from model.attention.danet import *
 from model.FCN.FCN import *
 from model.GCN.GCN import *
 from model.sync_batchnorm.replicate import patch_replication_callback
@@ -96,7 +97,27 @@ if __name__ == '__main__':
 
     logging.info("-done")
 
-    if args.model_type=='FCN':
+    if args.model_type=='DANet':
+        model = DANet(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='PANet':
+        model = DANet(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        mode='PA',
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='CANet':
+        model = DANet(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        mode='CA',
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='FCN':
         model = FCN(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
