@@ -80,7 +80,7 @@ def train(model, dataloader, optimizer, loss_fns, scheduler, evaluator, writer, 
                               loss.item(), i + len(dataloader) * epoch)
 
             t.set_postfix(loss='{:05.3f}'.format(
-                loss_avg()), lr='{:05.3f}'.format(current_lr))
+                loss_avg()), lr='{:05.5f}'.format(current_lr))
             t.update()
 
     # compute mean of all metrics in summary
