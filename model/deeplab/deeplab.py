@@ -21,14 +21,17 @@ class DeepLab(nn.Module):
 
         self.backbone = build_backbone(backbone, output_stride, BatchNorm)
         self.aspp = build_aspp(backbone, output_stride, BatchNorm)
-        self.decoder = build_decoder(num_classes, backbone, BatchNorm)
+        self.decoder = build_decoder(num_classes, BatchNorm)
 
         self.freeze_bn = freeze_bn
 
     def forward(self, input):
-        _, low_level_feat, _, x = self.backbone(input)
-        x = self.aspp(x)
-        x = self.decoder(x, low_level_feat)
+        fm1, fm2, fm3, fm4, _ = self.backbone(input)
+        x = self.aspp(fm4)
+        x = self.decoder(x)
+        x = F.interpolate(x, size=fm3.size()[2:], mode='bilinear', align_corners=True)
+        x = F.interpolate(x, size=fm2.size()[2:], mode='bilinear', align_corners=True)
+        x = F.interpolate(x, size=fm1.size()[2:], mode='bilinear', align_corners=True)
         x = F.interpolate(x, size=input.size()[2:], mode='bilinear', align_corners=True)
 
         return x

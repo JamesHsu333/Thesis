@@ -2,15 +2,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from model.backbone import build_backbone
-from model.GCN.BR import build_br
-from model.GCN.GCN_module import build_GCN
+from model.attention.attention import build_PAM
 from model.sync_batchnorm.batchnorm import SynchronizedBatchNorm2d
 
 
-class GCN(nn.Module):
+class ANet(nn.Module):
     def __init__(self, backbone='resnet', output_stride=16, num_classes=21,
                  sync_bn=True, freeze_bn=False):
-        super(GCN, self).__init__()
+        super(ANet, self).__init__()
 
         if sync_bn == True:
             BatchNorm = SynchronizedBatchNorm2d
@@ -18,21 +17,25 @@ class GCN(nn.Module):
             BatchNorm = nn.BatchNorm2d
 
         self.backbone = build_backbone(backbone, output_stride, BatchNorm)
+        self.head = ANetHead(1024, num_classes, BatchNorm)
 
         self.freeze_bn = freeze_bn
-        
-        self.gcn = build_GCN(1024, num_classes, k=15)
-        self.br = build_br(num_classes, BatchNorm)
 
     def forward(self,x):
+        """
+            inputs :
+                x : input imgs (B X C X H X W)
+            returns :
+                out : Position attention module (B X C X H X W)
+        """
         fm1, fm2, fm3, fm4, _ = self.backbone(x)
+        fm = self.head(fm4)
 
-        gc_fm = self.br(self.gcn(fm4))
-
-        gc_fm = F.interpolate(gc_fm, fm3.size()[2:], mode='bilinear', align_corners=True)
-        gc_fm = F.interpolate(gc_fm, fm2.size()[2:], mode='bilinear', align_corners=True)
-        gc_fm = F.interpolate(gc_fm, fm1.size()[2:], mode='bilinear', align_corners=True)
-        out = F.interpolate(gc_fm, x.size()[2:], mode='bilinear', align_corners=True)
+        fm = F.interpolate(fm, fm3.size()[2:], mode='bilinear', align_corners=True)
+        fm = F.interpolate(fm, fm2.size()[2:], mode='bilinear', align_corners=True)
+        fm = F.interpolate(fm, fm1.size()[2:], mode='bilinear', align_corners=True)
+        fm = F.interpolate(fm, x.size()[2:], mode='bilinear', align_corners=True)
+        out = fm
 
         return out
 
@@ -60,7 +63,7 @@ class GCN(nn.Module):
                                 yield p
 
     def get_10x_lr_params(self):
-        modules = [self.gcn, self.br]
+        modules = [self.head]
         for i in range(len(modules)):
             for m in modules[i].named_modules():
                 if self.freeze_bn:
@@ -74,3 +77,27 @@ class GCN(nn.Module):
                         for p in m[1].parameters():
                             if p.requires_grad:
                                 yield p
+
+class ANetHead(nn.Module):
+    def __init__(self, in_channels, out_channels, BatchNorm):
+        super(ANetHead, self).__init__()
+
+        self.sa = build_PAM(in_channels)
+
+        self.conv6 = nn.Sequential(nn.Conv2d(in_channels, out_channels, 1), 
+                                   BatchNorm(out_channels),
+                                   nn.ReLU(),
+                                   nn.Dropout2d(0.1, False))
+        self._init_weight()
+
+    def forward(self, x):
+        sa_feat = self.sa(x)
+        sa_output = self.conv6(sa_feat)
+
+        output = sa_output
+        return output
+
+    def _init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                torch.nn.init.kaiming_normal_(m.weight)
