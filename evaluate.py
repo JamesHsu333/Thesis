@@ -44,7 +44,7 @@ def evaluate(model, dataloader, loss_fns, evaluator, writer, epoch, params):
                 data_batch, labels_batch = data_batch.cuda(), labels_batch.cuda()
 
             with torch.no_grad():
-                output_batch = model(data_batch)
+                output_batch, _, _ = model(data_batch)
 
             loss = loss_fns['CrossEntropy'](params, output_batch, labels_batch)
 
@@ -111,6 +111,12 @@ if __name__ == '__main__':
                         freeze_bn=False)
     elif args.model_type=='GCN':
         model = GCN(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_C':
+        model = GCN_C(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,

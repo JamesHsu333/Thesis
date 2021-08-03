@@ -7,19 +7,25 @@ from model.deeplab.deeplab import *
 from model.FCN.FCN import *
 from model.GCN.GCN import *
 
-model = DeepLab(num_classes=21,
+model3 = DeepLab(num_classes=21,
                 backbone="resnet",
                 output_stride=16,
                 sync_bn=None,
                 freeze_bn=False).cuda()
 
-model3 = FCN(num_classes=21,
+model1 = FCN(num_classes=21,
             backbone="resnet",
             output_stride=16,
             sync_bn=None,
             freeze_bn=False).cuda()
 
 model1 = GCN(num_classes=21,
+            backbone="resnet",
+            output_stride=16,
+            sync_bn=None,
+            freeze_bn=False).cuda()
+
+model = GCN_C(num_classes=21,
             backbone="resnet",
             output_stride=16,
             sync_bn=None,

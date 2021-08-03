@@ -55,7 +55,7 @@ def train(model, dataloader, optimizer, loss_fns, scheduler, evaluator, writer, 
             optimizer.zero_grad()
 
             # Forward
-            output_batch = model(train_batch)
+            output_batch, _, _ = model(train_batch)
 
             # Backward
             loss = loss_fns['CrossEntropy'](params, output_batch, labels_batch)
@@ -179,6 +179,12 @@ if __name__ == '__main__':
                         freeze_bn=False)
     elif args.model_type=='GCN':
         model = GCN(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_C':
+        model = GCN_C(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,

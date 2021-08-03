@@ -29,12 +29,13 @@ class DeepLab(nn.Module):
         fm1, fm2, fm3, fm4, _ = self.backbone(input)
         x = self.aspp(fm4)
         x = self.decoder(x)
+        aspp_out = x
         x = F.interpolate(x, size=fm3.size()[2:], mode='bilinear', align_corners=True)
         x = F.interpolate(x, size=fm2.size()[2:], mode='bilinear', align_corners=True)
         x = F.interpolate(x, size=fm1.size()[2:], mode='bilinear', align_corners=True)
         x = F.interpolate(x, size=input.size()[2:], mode='bilinear', align_corners=True)
 
-        return x
+        return x, fm4, aspp_out
 
     def freeze_bn(self):
         for m in self.modules():

@@ -30,6 +30,7 @@ class ANet(nn.Module):
         """
         fm1, fm2, fm3, fm4, _ = self.backbone(x)
         fm = self.head(fm4)
+        attention_out = fm
 
         fm = F.interpolate(fm, fm3.size()[2:], mode='bilinear', align_corners=True)
         fm = F.interpolate(fm, fm2.size()[2:], mode='bilinear', align_corners=True)
@@ -37,7 +38,7 @@ class ANet(nn.Module):
         fm = F.interpolate(fm, x.size()[2:], mode='bilinear', align_corners=True)
         out = fm
 
-        return out
+        return out, fm4, attention_out
 
     def freeze_bn(self):
         for m in self.modules():
