@@ -21,11 +21,7 @@ class FCN(nn.Module):
         self.conv = nn.Sequential(nn.Conv2d(1024, num_classes, kernel_size=1, bias=False),
                                        BatchNorm(num_classes),
                                        nn.ReLU(),
-                                       nn.Dropout(0.5),
-                                       nn.Conv2d(num_classes, num_classes, kernel_size=3, stride=1, padding=1, bias=False),
-                                       BatchNorm(num_classes),
-                                       nn.ReLU(),
-                                       nn.Dropout(0.1))
+                                       nn.Dropout(0.5))
 
     def forward(self,x):
         fm1, fm2, fm3, fm4, _ = self.backbone(x)
