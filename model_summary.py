@@ -7,37 +7,43 @@ from model.deeplab.deeplab import *
 from model.FCN.FCN import *
 from model.GCN.GCN import *
 
-model3 = DeepLab(num_classes=21,
+model = DeepLab(num_classes=21,
                 backbone="resnet",
                 output_stride=16,
                 sync_bn=None,
                 freeze_bn=False).cuda()
 
-model1 = FCN(num_classes=21,
+model = FCN(num_classes=21,
             backbone="resnet",
             output_stride=16,
             sync_bn=None,
             freeze_bn=False).cuda()
 
-model1 = GCN(num_classes=21,
+model = GCN(num_classes=21,
             backbone="resnet",
             output_stride=16,
             sync_bn=None,
             freeze_bn=False).cuda()
 
-model2 = GCN_C(num_classes=21,
+model = GCN_C(num_classes=21,
             backbone="resnet",
             output_stride=16,
             sync_bn=None,
             freeze_bn=False).cuda()
 
-model2 = ANet(num_classes=21,
+model = ANet(num_classes=21,
             backbone="resnet",
             output_stride=16,
             sync_bn=None,
             freeze_bn=False).cuda()
 
 model = ANet_without_filter(num_classes=21,
+            backbone="resnet",
+            output_stride=16,
+            sync_bn=None,
+            freeze_bn=False).cuda()
+
+model = ANet_without_filter_alpha(num_classes=21,
             backbone="resnet",
             output_stride=16,
             sync_bn=None,
