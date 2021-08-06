@@ -31,22 +31,6 @@ parser.add_argument('--num_classes', default=21,
         help="Numbers of classes")
 parser.add_argument('--restore_file', default='best', help="name of the file in --model_dir \
         containing weights to load")
-parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', default='../../Dataset/VOC2012/JPEGImages',
-                    help="Directory containing the dataset")
-parser.add_argument('--mask_dir', default='../../Dataset/VOC2012/SegmentationClass',
-                    help="Directory containing the mask dataset")
-parser.add_argument('--dataset_dir', default='../../Dataset/VOC2012/ImageSets/Segmentation',
-                    help="Directory containing the train/val/test file names")
-parser.add_argument('--model_dir', default='experiments/base_model',
-                    help="Directory containing params.json")
-parser.add_argument('--model_type', default='GCN_Resnet',
-                    help="Type of GCN")
-parser.add_argument('--restore_file', default='best', help="name of the file in --model_dir \
-                     containing weights to load")
-parser.add_argument('--show_images', default='no', help="Show image")
-parser.add_argument('--num_classes', default=21,
-                    help="Numbers of classes")
 sns.set_theme()
 
 def evaluate_save_images(model, model_type, dataloader, params):
@@ -71,14 +55,13 @@ def evaluate_save_images(model, model_type, dataloader, params):
 
             output_batch_argmax = np.argmax(output_batch, axis=1)
 
-            #save_mask(labels_batch, model_type, i)
-            #save_prediction(output_batch_argmax, model_type, i)
+            save_mask(labels_batch, model_type, i)
+            save_prediction(output_batch_argmax, model_type, i)
             """
             if i==81:
                 save_heat_maps(fm4, fm4_out, output_batch, i)
                 break
             """
-            
             i+=1
             t.update()
     return
@@ -164,6 +147,12 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='ANet_without_filter':
+        model = ANet_without_filter(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='FCN':
         model = FCN(num_classes=args.num_classes,
                         backbone="resnet",
@@ -172,6 +161,12 @@ if __name__ == '__main__':
                         freeze_bn=False)
     elif args.model_type=='GCN':
         model = GCN(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_C':
+        model = GCN_C(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,
