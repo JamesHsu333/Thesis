@@ -9,7 +9,7 @@ class PAM(nn.Module):
         self.query_conv = nn.Conv2d(in_channels=in_dim, out_channels=in_dim//8, kernel_size=1)
         self.key_conv = nn.Conv2d(in_channels=in_dim, out_channels=in_dim//8, kernel_size=1)
         self.value_conv = nn.Conv2d(in_channels=in_dim, out_channels=in_dim, kernel_size=1)
-        self.gamma = nn.Parameter(torch.zeros(1))
+        self.gamma = nn.Parameter(torch.rand(1))
         self.softmax = nn.Softmax(dim=-1)
         self._init_weight()
     def forward(self, x):
@@ -107,7 +107,7 @@ class PAM_without_filter_alpha(nn.Module):
     def __init__(self):
         super(PAM_without_filter_alpha, self).__init__()
         self.softmax = nn.Softmax(dim=-1)
-        self.alpha = nn.Parameter(torch.zeros(1))
+        self.alpha = nn.Parameter(torch.randn(1))
         self._init_weight()
     def forward(self, x):
         """
