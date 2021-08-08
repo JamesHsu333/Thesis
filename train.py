@@ -183,6 +183,12 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_beta':
+        model = ANet_without_filter_beta(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='FCN':
         model = FCN(num_classes=args.num_classes,
                         backbone="resnet",

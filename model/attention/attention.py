@@ -134,6 +134,38 @@ class PAM_without_filter_alpha(nn.Module):
             if isinstance(m, nn.Conv2d):
                 torch.nn.init.kaiming_normal_(m.weight)
 
+class PAM_without_filter_beta(nn.Module):
+    """ Position attention module without 1x1 conv"""
+    def __init__(self):
+        super(PAM_without_filter_beta, self).__init__()
+        self.softmax = nn.Softmax(dim=-1)
+        self.beta = nn.Parameter(torch.rand(1))
+        self._init_weight()
+    def forward(self, x):
+        """
+            inputs :
+                x : input feature maps(B X C X H X W)
+            returns :
+                out : attention value + input feature
+                attention: B X (HxW) X (HxW)
+        """
+        m_batchsize, C, height, width = x.size()
+        proj_query = x.view(m_batchsize, -1, width*height).permute(0, 2, 1)
+        proj_key = x.view(m_batchsize, -1, width*height)
+        energy = torch.bmm(proj_query, proj_key)
+        attention = self.softmax(energy)
+        proj_value = x.view(m_batchsize, -1, width*height)
+
+        out = torch.bmm(proj_value, attention.permute(0, 2, 1))
+        out = out.view(m_batchsize, C, height, width)
+        out = x - self.beta*out
+        return out
+
+    def _init_weight(self):
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                torch.nn.init.kaiming_normal_(m.weight)
+
 def build_PAM(c):
     return PAM(c)
 
@@ -145,3 +177,6 @@ def build_PAM_without_filter():
 
 def build_PAM_without_filter_alpha():
     return PAM_without_filter_alpha()
+
+def build_PAM_without_filter_beta():
+    return PAM_without_filter_beta()

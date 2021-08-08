@@ -49,5 +49,11 @@ model = ANet_without_filter_alpha(num_classes=21,
             sync_bn=None,
             freeze_bn=False).cuda()
 
+model = ANet_without_filter_beta(num_classes=21,
+            backbone="resnet",
+            output_stride=16,
+            sync_bn=None,
+            freeze_bn=False).cuda()
+
 
 summary(model, (3, 513, 513))

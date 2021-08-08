@@ -115,6 +115,12 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_beta':
+        model = ANet_without_filter_beta(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='FCN':
         model = FCN(num_classes=args.num_classes,
                         backbone="resnet",
@@ -167,3 +173,8 @@ if __name__ == '__main__':
             args.model_dir, "metrics_test_{}.json".format(args.restore_file))
     utils.save_dict_to_json(test_metrics, save_path)
     logging.info("- done.")
+
+    for name, param in model.named_parameters():
+        if param.requires_grad:
+            if ("alpha" in name) or ("beta" in name) or ("gamma" in name):
+                print(name, param.data)
