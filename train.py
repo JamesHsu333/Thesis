@@ -201,6 +201,12 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='GCN_Large':
+        model = GCN_Large(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='GCN_C':
         model = GCN_C(num_classes=args.num_classes,
                         backbone="resnet",
