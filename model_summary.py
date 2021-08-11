@@ -31,6 +31,12 @@ model = GCN_C(num_classes=21,
             sync_bn=None,
             freeze_bn=False).cuda()
 
+model = GCN_Large(num_classes=21,
+            backbone="resnet",
+            output_stride=16,
+            sync_bn=None,
+            freeze_bn=False).cuda()
+
 model = ANet(num_classes=21,
             backbone="resnet",
             output_stride=16,
