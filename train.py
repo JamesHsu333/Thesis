@@ -74,13 +74,19 @@ def train(model, dataloader, optimizer, loss_fns, scheduler, evaluator, writer, 
 
             # update the average loss
             loss_avg.update(loss.item())
+            weight=0
+            for name, param in model.named_parameters():
+                if param.requires_grad:
+                    if ("alpha" in name) or ("beta" in name) or ("gamma" in name):
+                        weight=param.data.cpu().numpy()[0]
+                        break
 
             # tensorboard summary
             writer.add_scalar('train/total_loss_iter',
                               loss.item(), i + len(dataloader) * epoch)
 
             t.set_postfix(loss='{:05.3f}'.format(
-                loss_avg()), lr='{:05.5f}'.format(current_lr))
+                loss_avg()), lr='{:05.5f}'.format(current_lr), weight='{:05.5f}'.format(weight))
             t.update()
 
     # compute mean of all metrics in summary
@@ -209,6 +215,12 @@ if __name__ == '__main__':
                         freeze_bn=False)
     elif args.model_type=='GCN_C':
         model = GCN_C(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_Large_C':
+        model = GCN_Large_C(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,

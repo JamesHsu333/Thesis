@@ -78,6 +78,11 @@ class ANet(nn.Module):
                         for p in m[1].parameters():
                             if p.requires_grad:
                                 yield p
+            for name, m in modules[i].named_parameters():
+                if "gamma" in name:
+                    if isinstance(m, nn.Parameter):
+                        if m.requires_grad:
+                            yield m
 
 class ANetHead(nn.Module):
     def __init__(self, in_channels, out_channels, BatchNorm):
@@ -272,6 +277,11 @@ class ANet_without_filter_alpha(nn.Module):
                         for p in m[1].parameters():
                             if p.requires_grad:
                                 yield p
+            for name, m in modules[i].named_parameters():
+                if "alpha" in name:
+                    if isinstance(m, nn.Parameter):
+                        if m.requires_grad:
+                            yield m
 
 class ANetHead_without_filter_alpha(nn.Module):
     def __init__(self, in_channels, out_channels, BatchNorm):
@@ -369,6 +379,12 @@ class ANet_without_filter_beta(nn.Module):
                         for p in m[1].parameters():
                             if p.requires_grad:
                                 yield p
+            for name, m in modules[i].named_parameters():
+                if "beta" in name:
+                    if isinstance(m, nn.Parameter):
+                        if m.requires_grad:
+                            yield m
+
 
 class ANetHead_without_filter_beta(nn.Module):
     def __init__(self, in_channels, out_channels, BatchNorm):
