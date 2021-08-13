@@ -223,7 +223,7 @@ class GCN_C(nn.Module):
 class GCN_Large_C(nn.Module):
     def __init__(self, backbone='resnet', output_stride=16, num_classes=21,
                  sync_bn=True, freeze_bn=False):
-        super(GCN_C, self).__init__()
+        super(GCN_Large_C, self).__init__()
 
         if sync_bn == True:
             BatchNorm = SynchronizedBatchNorm2d
