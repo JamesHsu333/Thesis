@@ -139,7 +139,7 @@ class PAM_without_filter_beta(nn.Module):
     def __init__(self):
         super(PAM_without_filter_beta, self).__init__()
         self.softmax = nn.Softmax(dim=-1)
-        self.beta = nn.Parameter(torch.Tensor([0.5]))
+        self.beta = nn.Parameter(torch.Tensor([1]))
         self._init_weight()
     def forward(self, x):
         """

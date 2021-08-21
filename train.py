@@ -225,6 +225,18 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='deeplab_with_GCN':
+        model = DeepLab_with_GCN(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='deepLab_with_attention':
+        model = DeepLab_with_attention(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     else:
         model = DeepLab(num_classes=args.num_classes,
                         backbone="resnet",

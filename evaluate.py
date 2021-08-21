@@ -81,8 +81,6 @@ if __name__ == '__main__':
 
     params.cuda = torch.cuda.is_available()
 
-    params.batch_size = 1
-
     torch.manual_seed(1)
     if params.cuda:
         torch.cuda.manual_seed(1)
@@ -147,6 +145,18 @@ if __name__ == '__main__':
                         freeze_bn=False)
     elif args.model_type=='GCN_Large_C':
         model = GCN_Large_C(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='deeplab_with_GCN':
+        model = DeepLab_with_GCN(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='deepLab_with_attention':
+        model = DeepLab_with_attention(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,
