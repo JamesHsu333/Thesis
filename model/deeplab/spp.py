@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from model.attention.attention import build_PAM_without_filter_beta
+from model.GCN.BR import build_br
 from model.GCN.GCN_module import build_GCN
 from model.sync_batchnorm.batchnorm import SynchronizedBatchNorm2d
 
@@ -47,6 +48,9 @@ class SPP(nn.Module):
         self.spp2 = build_GCN(1024, 256, k=15)
         self.spp3 = build_GCN(1024, 256, k=27)
         self.spp4 = build_GCN(1024, 256, k=33)
+        self.br1 = build_br(256, BatchNorm)
+        self.br2 = build_br(256, BatchNorm)
+        self.br3 = build_br(256, BatchNorm)
 
         self.global_avg_pool = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)),
                                              nn.Conv2d(inplanes, 256, 1, stride=1, bias=False),
@@ -59,9 +63,9 @@ class SPP(nn.Module):
 
     def forward(self, x):
         x1 = self.spp1(x)
-        x2 = self.spp2(x)
-        x3 = self.spp3(x)
-        x4 = self.spp4(x)
+        x2 = self.br1(self.spp2(x))
+        x3 = self.br2(self.spp3(x))
+        x4 = self.br3(self.spp4(x))
         x5 = self.global_avg_pool(x)
         x5 = F.interpolate(x5, size=x4.size()[2:], mode='bilinear', align_corners=True)
         x = torch.cat((x1, x2, x3, x4, x5), dim=1)
