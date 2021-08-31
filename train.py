@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 import dataloaders.dataloader as dataloader
 from evaluate import evaluate
+from model.ablation.net import *
 from model.attention.anet import *
 from model.deeplab.deeplab import *
 from model.FCN.FCN import *
@@ -231,8 +232,14 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
-    elif args.model_type=='deepLab_with_attention':
+    elif args.model_type=='deeplab_with_attention':
         model = DeepLab_with_attention(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='net':
+        model = Net(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,
@@ -245,7 +252,7 @@ if __name__ == '__main__':
                         freeze_bn=False)
 
 
-    logging.info("-Model Type: {}".format(args.model_type))
+    logging.info("-Model Type: {}".format(model.__class__.__name__))
 
     train_params = [{'params': model.get_1x_lr_params(), 'lr': params.learning_rate},
                     {'params': model.get_10x_lr_params(), 'lr': params.learning_rate * 10}]

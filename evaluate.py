@@ -11,8 +11,9 @@ import torch.nn.functional as F
 from tqdm import tqdm
 
 import dataloaders.dataloader as dataloader
-from model.deeplab.deeplab import *
+from model.ablation.net import *
 from model.attention.anet import *
+from model.deeplab.deeplab import *
 from model.FCN.FCN import *
 from model.GCN.GCN import *
 from model.sync_batchnorm.replicate import patch_replication_callback
@@ -155,8 +156,14 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
-    elif args.model_type=='deepLab_with_attention':
+    elif args.model_type=='deeplab_with_attention':
         model = DeepLab_with_attention(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='net':
+        model = Net(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,
@@ -173,7 +180,7 @@ if __name__ == '__main__':
         patch_replication_callback(model)
         model = model.cuda()
 
-    logging.info("-Model Type: {}".format(args.model_type))
+    logging.info("-Model Type: {}".format(model.__class__.__name__))
 
     loss_fns = loss_fns
 

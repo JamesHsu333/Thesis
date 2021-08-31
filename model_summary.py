@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torchsummary import summary
 
+from model.ablation.net import *
 from model.attention.anet import *
 from model.deeplab.deeplab import *
 from model.FCN.FCN import *
@@ -74,6 +75,12 @@ model = DeepLab_with_GCN(num_classes=21,
                 freeze_bn=False).cuda()
 
 model = DeepLab_with_attention(num_classes=21,
+                backbone="resnet",
+                output_stride=16,
+                sync_bn=None,
+                freeze_bn=False).cuda()
+
+model = Net(num_classes=21,
                 backbone="resnet",
                 output_stride=16,
                 sync_bn=None,
