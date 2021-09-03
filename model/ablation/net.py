@@ -23,17 +23,21 @@ class Net(nn.Module):
         self.backbone = build_backbone(backbone, output_stride, BatchNorm)
 
         self.attention = build_PAM_without_filter_beta()
-
-        self.gcn = build_GCN(1024, 1024, k=33)
-        self.br = build_br(1024, BatchNorm)
-
-        self.decoder = build_decoder(1024, BatchNorm)
-        self.spp = build_spp(backbone, BatchNorm)
-
-        self.classifier = nn.Sequential(nn.Conv2d(1024, num_classes, 1), 
+        self.attention_classifier = nn.Sequential(nn.Conv2d(1024, num_classes, 1), 
                                      BatchNorm(num_classes),
                                      nn.ReLU(),
                                      nn.Dropout2d(0.1, False))
+
+        self.gcn = build_GCN(1024, 1024, k=33)
+        self.br = build_br(1024, BatchNorm)
+        self.gcn_classifier = nn.Sequential(nn.Conv2d(1024, num_classes, 1), 
+                                     BatchNorm(num_classes),
+                                     nn.ReLU(),
+                                     nn.Dropout2d(0.1, False))
+
+        self.decoder = build_decoder(num_classes, BatchNorm)
+        self.spp = build_spp(backbone, BatchNorm)
+
         self.alpha = nn.Parameter(torch.Tensor([1,1,1]))
         self.softmax = nn.Softmax(dim=-1)
         self.freeze_bn = freeze_bn
@@ -41,20 +45,19 @@ class Net(nn.Module):
     def forward(self,x):
         fm1, fm2, fm3, fm4, _ = self.backbone(x)
 
-        gc_fm = self.br(self.gcn(fm4))
+        gc_fm = self.gcn_classifier(self.br(self.gcn(fm4)))
         spp_fm = self.decoder(self.spp(fm4))
-        at_fm = self.attention(fm4)
+        at_fm = self.attention_classifier(self.attention(fm4))
         
         alpha = self.softmax(self.alpha)
         fm_out = alpha[0]*gc_fm+alpha[1]*spp_fm+alpha[2]*at_fm
-        classified_fm = self.classifier(fm_out)
 
-        out = F.interpolate(classified_fm, fm3.size()[2:], mode='bilinear', align_corners=True)
+        out = F.interpolate(fm_out, fm3.size()[2:], mode='bilinear', align_corners=True)
         out = F.interpolate(out, fm2.size()[2:], mode='bilinear', align_corners=True)
         out = F.interpolate(out, fm1.size()[2:], mode='bilinear', align_corners=True)
         out = F.interpolate(out, x.size()[2:], mode='bilinear', align_corners=True)
 
-        return out, fm4, classified_fm
+        return out, fm4, fm_out
 
     def freeze_bn(self):
         for m in self.modules():
@@ -80,7 +83,7 @@ class Net(nn.Module):
                                 yield p
 
     def get_10x_lr_params(self):
-        modules = [self.attention, self.gcn, self.br, self.spp, self.decoder, self.classifier]
+        modules = [self.attention, self.gcn, self.br, self.spp, self.decoder, self.attention_classifier, self.gcn_classifier]
         for i in range(len(modules)):
             for m in modules[i].named_modules():
                 if self.freeze_bn:

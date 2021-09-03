@@ -75,19 +75,20 @@ def train(model, dataloader, optimizer, loss_fns, scheduler, evaluator, writer, 
 
             # update the average loss
             loss_avg.update(loss.item())
-            weight=0
+            info={}
             for name, param in model.named_parameters():
                 if param.requires_grad:
                     if ("alpha" in name) or ("beta" in name) or ("gamma" in name):
-                        weight=param.data.cpu().numpy()[0]
-                        break
+                        temp = param.data.cpu().numpy()
+                        for ii in range(len(temp)):
+                            info[name+"[{}]".format(ii)] = temp[ii]
 
             # tensorboard summary
             writer.add_scalar('train/total_loss_iter',
                               loss.item(), i + len(dataloader) * epoch)
 
             t.set_postfix(loss='{:05.3f}'.format(
-                loss_avg()), lr='{:05.5f}'.format(current_lr), weight='{:05.5f}'.format(weight))
+                loss_avg()), lr='{:05.5f}'.format(current_lr), info=" ; ".join("{}: {:05.3f}".format(n, w)for n, w in info.items()))
             t.update()
 
     # compute mean of all metrics in summary
