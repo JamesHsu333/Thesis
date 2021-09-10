@@ -138,7 +138,7 @@ class Net_Cat(nn.Module):
         spp_fm = self.spp(fm4)
         at_fm = self.attention(fm4)
 
-        fm_out = self.classifier(torch.cat(gc_fm, spp_fm, at_fm))
+        fm_out = self.classifier(torch.cat((gc_fm, spp_fm, at_fm), dim=1))
 
         out = F.interpolate(fm_out, fm3.size()[2:], mode='bilinear', align_corners=True)
         out = F.interpolate(out, fm2.size()[2:], mode='bilinear', align_corners=True)
