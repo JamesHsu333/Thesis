@@ -105,3 +105,88 @@ class Net(nn.Module):
         if isinstance(self.alpha, nn.Parameter):
             if self.alpha.requires_grad:
                 yield self.alpha
+
+class Net_Cat(nn.Module):
+    def __init__(self, backbone='resnet', output_stride=16, num_classes=21,
+                 sync_bn=True, freeze_bn=False):
+        super(Net_Cat, self).__init__()
+
+        if sync_bn == True:
+            BatchNorm = SynchronizedBatchNorm2d
+        else:
+            BatchNorm = nn.BatchNorm2d
+        
+        self.backbone = build_backbone(backbone, output_stride, BatchNorm)
+
+        self.attention = build_PAM_without_filter_beta()
+
+        self.gcn = build_GCN(1024, 1024, k=33)
+        self.br = build_br(1024, BatchNorm)
+
+        self.spp = build_spp(backbone, BatchNorm)
+
+        self.classifier = nn.Sequential(nn.Conv2d(3328, num_classes, 1), 
+                                     BatchNorm(num_classes),
+                                     nn.ReLU(),
+                                     nn.Dropout2d(0.1, False))
+        self.freeze_bn = freeze_bn
+
+    def forward(self,x):
+        fm1, fm2, fm3, fm4, _ = self.backbone(x)
+
+        gc_fm = self.br(self.gcn(fm4))
+        spp_fm = self.spp(fm4)
+        at_fm = self.attention(fm4)
+
+        fm_out = self.classifier(torch.cat(gc_fm, spp_fm, at_fm))
+
+        out = F.interpolate(fm_out, fm3.size()[2:], mode='bilinear', align_corners=True)
+        out = F.interpolate(out, fm2.size()[2:], mode='bilinear', align_corners=True)
+        out = F.interpolate(out, fm1.size()[2:], mode='bilinear', align_corners=True)
+        out = F.interpolate(out, x.size()[2:], mode='bilinear', align_corners=True)
+
+        return out, fm4, fm_out
+
+    def freeze_bn(self):
+        for m in self.modules():
+            if isinstance(m, SynchronizedBatchNorm2d):
+                m.eval()
+            elif isinstance(m, nn.BatchNorm2d):
+                m.eval()
+
+    def get_1x_lr_params(self):
+        modules = [self.backbone]
+        for i in range(len(modules)):
+            for m in modules[i].named_modules():
+                if self.freeze_bn:
+                    if isinstance(m[1], nn.Conv2d):
+                        for p in m[1].parameters():
+                            if p.requires_grad:
+                                yield p
+                else:
+                    if isinstance(m[1], nn.Conv2d) or isinstance(m[1], SynchronizedBatchNorm2d) \
+                            or isinstance(m[1], nn.BatchNorm2d):
+                        for p in m[1].parameters():
+                            if p.requires_grad:
+                                yield p
+
+    def get_10x_lr_params(self):
+        modules = [self.attention, self.gcn, self.br, self.spp, self.classifier]
+        for i in range(len(modules)):
+            for m in modules[i].named_modules():
+                if self.freeze_bn:
+                    if isinstance(m[1], nn.Conv2d):
+                        for p in m[1].parameters():
+                            if p.requires_grad:
+                                yield p
+                else:
+                    if isinstance(m[1], nn.Conv2d) or isinstance(m[1], SynchronizedBatchNorm2d) \
+                            or isinstance(m[1], nn.BatchNorm2d):
+                        for p in m[1].parameters():
+                            if p.requires_grad:
+                                yield p
+            for name, m in modules[i].named_parameters():
+                if "alpha" in name or "beta" in name:
+                    if isinstance(m, nn.Parameter):
+                        if m.requires_grad:
+                            yield m

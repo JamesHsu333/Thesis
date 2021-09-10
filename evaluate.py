@@ -192,6 +192,12 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='net_cat':
+        model = Net_Cat(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     else:
         model = DeepLab(num_classes=args.num_classes,
                         backbone="resnet",
