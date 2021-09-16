@@ -783,7 +783,8 @@ class ANet_best_res(nn.Module):
                                 yield p
 
     def get_10x_lr_params(self):
-        modules = [self.attention1, self.attention2, self.attention3, self.attention4, self.classifier]
+        #modules = [self.attention1, self.attention2, self.attention3, self.attention4, self.classifier]
+        modules = [self.attention3, self.attention4, self.classifier]
         for i in range(len(modules)):
             for m in modules[i].named_modules():
                 if self.freeze_bn:
