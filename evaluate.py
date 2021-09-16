@@ -174,6 +174,30 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='ANet_best_res1':
+        model = ANet_best_res1(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_best_res2':
+        model = ANet_best_res2(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_best_res3':
+        model = ANet_best_res3(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_best_res':
+        model = ANet_best_res(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='deeplab_with_GCN':
         model = DeepLab_with_GCN(num_classes=args.num_classes,
                         backbone="resnet",
