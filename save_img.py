@@ -13,8 +13,9 @@ import torch.nn.functional as F
 from tqdm import tqdm
 
 import dataloaders.dataloader as dataloader
-from model.deeplab.deeplab import *
+from model.ablation.net import *
 from model.attention.anet import *
+from model.deeplab.deeplab import *
 from model.FCN.FCN import *
 from model.GCN.GCN import *
 from model.sync_batchnorm.replicate import patch_replication_callback
@@ -153,6 +154,18 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_alpha':
+        model = ANet_without_filter_alpha(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_beta':
+        model = ANet_without_filter_beta(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='FCN':
         model = FCN(num_classes=args.num_classes,
                         backbone="resnet",
@@ -165,8 +178,116 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='GCN_1':
+        model = GCN_1(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_2':
+        model = GCN_2(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_3':
+        model = GCN_3(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_res':
+        model = GCN_res(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_Large':
+        model = GCN_Large(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='GCN_C':
         model = GCN_C(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_Large_C':
+        model = GCN_Large_C(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_C_res1':
+        model = GCN_C_res1(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_C_res2':
+        model = GCN_C_res2(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_C_res3':
+        model = GCN_C_res3(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='GCN_C_res':
+        model = GCN_C_res(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_best_res1':
+        model = ANet_best_res1(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_best_res2':
+        model = ANet_best_res2(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_best_res3':
+        model = ANet_best_res3(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_best_res':
+        model = ANet_best_res(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='deeplab_with_GCN':
+        model = DeepLab_with_GCN(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='deeplab_with_attention':
+        model = DeepLab_with_attention(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='net':
+        model = Net(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='net_cat':
+        model = Net_Cat(num_classes=args.num_classes,
                         backbone="resnet",
                         output_stride=16,
                         sync_bn=False,
@@ -183,9 +304,9 @@ if __name__ == '__main__':
         patch_replication_callback(model)
         model = model.cuda()
 
-    logging.info("-Model Type: {}".format(args.model_type))
+    logging.info("-Model Type: {}".format(model.__class__.__name__))
 
-    logging.info("Saving image")
+    logging.info("-Saving image...")
 
     # Reload weights from the saved file
     utils.load_checkpoint(os.path.join(
@@ -194,4 +315,4 @@ if __name__ == '__main__':
     # Save images
     evaluate_save_images(model, args.model_type, test_dl, params)
 
-    logging.info("- done.")
+    logging.info("-done.")
