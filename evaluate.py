@@ -120,6 +120,41 @@ if __name__ == '__main__':
                         output_stride=16,
                         sync_bn=False,
                         freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_gamma=0.25':
+        model = ANet_without_filter_gamma(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        gamma=0.25,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_gamma=0.75':
+        model = ANet_without_filter_gamma(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        gamma=0.75,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_gamma=1.25':
+        model = ANet_without_filter_gamma(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        gamma=1.25,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_gamma=1.5':
+        model = ANet_without_filter_gamma(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        gamma=1.5,
+                        sync_bn=False,
+                        freeze_bn=False)
+    elif args.model_type=='ANet_without_filter_gamma=1.75':
+        model = ANet_without_filter_gamma(num_classes=args.num_classes,
+                        backbone="resnet",
+                        output_stride=16,
+                        gamma=1.75,
+                        sync_bn=False,
+                        freeze_bn=False)
     elif args.model_type=='FCN':
         model = FCN(num_classes=args.num_classes,
                         backbone="resnet",
