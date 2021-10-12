@@ -41,7 +41,7 @@ if __name__ == "__main__":
     params = utils.Params(json_path)
 
     # Perform hypersearch over one parameter
-    models = ['ANet_without_filter_gamma=0.25', 'ANet_without_filter_gamma=0.75', 'ANet_without_filter_gamma=1.25', 'ANet_without_filter_gamma=1.5', 'ANet_without_filter_gamma=1.75']
+    models = ['ANet_without_filter_gamma=0']
 
     for model in models:
         # Launch job (name has to be unique)
